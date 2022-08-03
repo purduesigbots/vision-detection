@@ -63,6 +63,8 @@
 #include "pros/screen.h"
 #include "pros/vision.h"
 
+#include "visiondetect/api.h"
+
 #ifdef __cplusplus
 #include "pros/adi.hpp"
 #include "pros/distance.hpp"

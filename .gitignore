@@ -12,5 +12,6 @@ bin/
 compile_commands.json
 temp.log
 temp.errors
+.cache/
 *.ini
 .d/
