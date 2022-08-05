@@ -1,5 +1,17 @@
 #include "main.h"
+#include "pros/llemu.hpp"
+#include "pros/vision.h"
 
+visiondetect::Object shirt = visiondetect::Object(
+	pros::Vision::signature_from_utility(1, 7695, 9019, 8357, -4133, -2679, -3406, 3.000, 0),
+	1.05,
+	5,
+	31,
+	50,
+	0.15
+	);
+
+visiondetect::Vision advanced_vision = visiondetect::Vision(5);
 /**
  * A callback function for LLEMU's center button.
  *
@@ -27,6 +39,9 @@ void initialize() {
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
+
+
+
 }
 
 /**
@@ -77,16 +92,16 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	pros::Motor left_mtr(1);
 	pros::Motor right_mtr(2);
-
+	visiondetect::detected_object_s_t found;
 	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
-
-		left_mtr = left;
-		right_mtr = right;
-		pros::delay(20);
+		found = advanced_vision.detect_object(shirt);
+		pros::lcd::set_text(1, "Area: " + std::to_string(found.area));
+		pros::lcd::set_text(2, "Dist: " + std::to_string(found.apprx_distance));
+		pros::lcd::set_text(3, "Valid: " + std::to_string(found.valid));
+		//show x and y position
+		pros::lcd::set_text(4, "X: " + std::to_string(found.x_px));
+		pros::lcd::set_text(5, "Y: " + std::to_string(found.y_px));
+		printf("loop\n");
+		pros::delay(1000);
 	}
 }

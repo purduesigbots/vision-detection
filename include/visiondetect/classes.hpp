@@ -19,8 +19,8 @@ namespace visiondetect {
 
         bool predict_offscreen;
 
-        Object(int sig);
-        ~Object();
+        Object(pros::vision_signature_s_t sig, float ratio, int sample_size, int best_brightness, int min_area, float ratio_range);
+        //~Object();
         void apprx_distance(visiondetect::detected_object_s_t);
         void add_sample(visiondetect::simple_object_data_s_t sample);
         void add_samples(visiondetect::simple_object_data_s_t *samples, int size);
@@ -42,8 +42,8 @@ namespace visiondetect {
         int port;
         int screen_padding;
 
-        Vision(int port, int, int, int);
-        ~Vision();
+        Vision(int port, int n_samples = 5, int n_retries = 10, int screen_padding = 4);
+        //~Vision();
         void calibrate_brightness(visiondetect::Object);
         visiondetect::detected_object_s_t find_object(visiondetect::Object);
         visiondetect::detected_object_s_t detect_object(visiondetect::Object);

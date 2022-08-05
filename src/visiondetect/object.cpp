@@ -22,20 +22,11 @@ void visiondetect::Object::apprx_distance(visiondetect::detected_object_s_t obj)
     }
 };
 
-class Object {
-    public:
-        visiondetect::simple_object_data_s_t *data;
-        pros::vision_signature_s_t signature;
-        int sample_size;
-        int best_brightness;
-        float ratio;
-        float ratio_range;
-        bool predict_offscreen;
-
-        Object(int sig);
-        ~Object();
-        void detect();
-        void add_sample(visiondetect::simple_object_data_s_t sample);
-        void add_samples(visiondetect::simple_object_data_s_t *samples, int size);
-        void clear_samples();
-};
+visiondetect::Object::Object(pros::vision_signature_s_t sig, float ratio, int samples=5, int brightness=55, int min_area=50, float ratio_range=0.15) {
+    this->signature = sig;
+    this->ratio = ratio;
+    this->sample_size = samples;
+    this->best_brightness = brightness;
+    this->min_area = min_area;
+    this->ratio_range = ratio_range;
+}

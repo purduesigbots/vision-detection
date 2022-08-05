@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-visiondetect::Vision::Vision(int port, int n_samples = 5, int n_retries = 10, int screen_padding = 4)
+visiondetect::Vision::Vision(int port, int n_samples, int n_retries, int screen_padding)
 {
     this->screen_padding = screen_padding;
     this->port = port;
@@ -66,6 +66,7 @@ visiondetect::detected_object_s_t visiondetect::Vision::find_object(visiondetect
     detected.valid=false;
 
     // set our signature and exposure
+    printf("OBJECT SIGNATURE: %d\n", obj.signature.u_mean);
     this->sensor->set_signature(1,&obj.signature);
     this->sensor->set_exposure(obj.best_brightness);
     // while we haven't found the object and we haven't exceeded our retry limit
@@ -77,12 +78,16 @@ visiondetect::detected_object_s_t visiondetect::Vision::find_object(visiondetect
         uint16_t* y_samples = (uint16_t*)malloc(sizeof(uint16_t)*this->n_samples);
         // get our samples
         for(int i=0; i<this->n_samples; i++) {
-            pros::vision_object_s_t c_obj = this->sensor->get_by_sig(size_search, 1);
+            pros::vision_object_s_t c_obj = this->sensor->get_by_sig(0, 1);
             // insertion sort the samples as we get them
             insert_sort_samples(width_samples, c_obj.width, i);
             insert_sort_samples(height_samples, c_obj.height, i);
             insert_sort_samples(x_samples, c_obj.x_middle_coord, i);
             insert_sort_samples(y_samples, c_obj.y_middle_coord, i);
+        }
+
+        for(int i=0; i<this->n_samples; i++) {
+            //printf("width %d: %d\n", i, width_samples[i]);
         }
         // set detected to our median values
         detected.height=height_samples[this->n_samples/2];
@@ -98,6 +103,7 @@ visiondetect::detected_object_s_t visiondetect::Vision::find_object(visiondetect
         free(y_samples);
 
         // check if detected is valid
+        printf("Detected stats: %d, %d, %d, %d, %d\n", detected.height, detected.width, detected.x_px, detected.y_px, detected.area);
         detected.valid = validate_object(obj, detected);
         // increment size_search
         size_search++;
@@ -108,7 +114,10 @@ visiondetect::detected_object_s_t visiondetect::Vision::find_object(visiondetect
 }
 
 visiondetect::detected_object_s_t visiondetect::Vision::detect_object(visiondetect::Object obj) {
+    printf("finding object\n");
     visiondetect::detected_object_s_t detected = find_object(obj);
+    printf("approximating object\n");
     obj.apprx_distance(detected);
+    printf("returned\n");
     return detected;
 }
