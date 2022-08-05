@@ -5,12 +5,13 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-visiondetect::Vision::Vision(int port, int n_samples, int n_retries, int screen_padding)
+visiondetect::Vision::Vision(int port, int n_samples, int n_retries, int screen_padding, bool predict_offscreen)
 {
     this->screen_padding = screen_padding;
     this->port = port;
     this->n_samples = n_samples;
     this->n_retries = n_retries;
+    this->predict_offscreen = predict_offscreen;
 
     this->sensor = std::make_shared<pros::Vision>(port, pros::E_VISION_ZERO_CENTER);
 }
@@ -31,7 +32,8 @@ void visiondetect::Vision::insert_sort_samples(uint16_t* arr, uint16_t val, int 
 }
 
 bool visiondetect::Vision::validate_object(visiondetect::Object obj, visiondetect::detected_object_s_t detected_object) {
-    if(obj.predict_offscreen) {
+
+    if(this->predict_offscreen) {
         // if edge of object is >= the edge of the padding
         bool xedge = (abs(detected_object.x_px)+(detected_object.width/2.0) >=(VISION_FOV_WIDTH - screen_padding));
         bool yedge = (abs(detected_object.y_px)+(detected_object.height/2.0) >=(VISION_FOV_HEIGHT - screen_padding));
@@ -56,7 +58,9 @@ bool visiondetect::Vision::validate_object(visiondetect::Object obj, visiondetec
     }
     //check if the detected object's true ratio is within the range of a valid ratio.
     double detected_ratio = (double)detected_object.width / (double)detected_object.height;
-    return (detected_ratio > (obj.ratio*(1+obj.ratio_range))) && (detected_ratio < (obj.ratio*(1+obj.ratio_range))) && (detected_object.area > obj.min_area);
+    printf("detected ratio: %lf\n", detected_ratio);
+ 
+    return (detected_ratio > (obj.ratio*(1-obj.ratio_range))) && (detected_ratio < (obj.ratio*(1+obj.ratio_range))) && (detected_object.area > obj.min_area);
 }
 
 visiondetect::detected_object_s_t visiondetect::Vision::find_object(visiondetect::Object obj) {

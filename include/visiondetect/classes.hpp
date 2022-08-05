@@ -42,7 +42,9 @@ namespace visiondetect {
         int port;
         int screen_padding;
 
-        Vision(int port, int n_samples = 5, int n_retries = 10, int screen_padding = 4);
+        bool predict_offscreen;
+
+        Vision(int port, int n_samples = 5, int n_retries = 10, int screen_padding = 4, bool predict_offscreen = false);
         //~Vision();
         void calibrate_brightness(visiondetect::Object);
         visiondetect::detected_object_s_t find_object(visiondetect::Object);

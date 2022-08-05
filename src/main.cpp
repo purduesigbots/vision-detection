@@ -2,16 +2,6 @@
 #include "pros/llemu.hpp"
 #include "pros/vision.h"
 
-visiondetect::Object shirt = visiondetect::Object(
-	pros::Vision::signature_from_utility(1, 7695, 9019, 8357, -4133, -2679, -3406, 3.000, 0),
-	1.05,
-	5,
-	31,
-	50,
-	0.15
-	);
-
-visiondetect::Vision advanced_vision = visiondetect::Vision(5);
 /**
  * A callback function for LLEMU's center button.
  *
@@ -89,9 +79,18 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
+	
+	visiondetect::Object shirt = visiondetect::Object(
+	pros::Vision::signature_from_utility(1, 7695, 9019, 8357, -4133, -2679, -3406, 3.000, 0),
+	1.05,
+	5,
+	31,
+	50,
+	0.15
+	);
+
+	visiondetect::Vision advanced_vision = visiondetect::Vision(5);
+
 	visiondetect::detected_object_s_t found;
 	while (true) {
 		found = advanced_vision.detect_object(shirt);
