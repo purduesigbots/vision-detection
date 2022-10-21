@@ -1,6 +1,7 @@
 #include "main.h"
 #include "pros/llemu.hpp"
 #include "pros/vision.h"
+#include "visiondetect/classes.hpp"
 
 /**
  * A callback function for LLEMU's center button.
@@ -25,6 +26,7 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+	printf("lkfjalfkjs\n");
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
 
@@ -78,29 +80,80 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+
+void increase() {
+	int i=0;
+	while(true) {
+		pros::lcd::set_text(4, "Current Count: " + std::to_string(++i));
+		pros::delay(50);
+	}
+}
+
 void opcontrol() {
-	
-	visiondetect::Object shirt = visiondetect::Object(
-	pros::Vision::signature_from_utility(1, 7695, 9019, 8357, -4133, -2679, -3406, 3.000, 0),
-	1.05,
+	pros::Task t(increase);
+	visiondetect::Object yellow_disk = visiondetect::Object(
+	pros::Vision::signature_from_utility(1, -369, 105, -132, -4493, -3939, -4216, 3.000, 0),
+	1,
 	5,
-	31,
+	52,
 	50,
 	0.15
 	);
 
-	visiondetect::Vision advanced_vision = visiondetect::Vision(5);
+	visiondetect::Object yellow_goal = visiondetect::Object(
+	pros::Vision::signature_from_utility(2, 1437, 1743, 1590, -3563, -3207, -3385, 3.000, 0),
+	2,
+	5,
+	15,
+	100,
+	0.30
+	);
 
-	visiondetect::detected_object_s_t found;
+
+	printf("Created objects\n");
+	pros::delay(100);
+	printf("kfjalsdjfsfa\n");
+	visiondetect::Vision advanced_vision = visiondetect::Vision(
+		1,
+		5,
+		2,
+		5,
+		false
+		);
+	printf("EEEEE\n");
+	visiondetect::detected_object_s_t found_disk;
+	visiondetect::detected_object_s_t found_goal;
+	printf("made object arrays\n");
+	pros::delay(1000);
+	printf("Created vision object\n");
 	while (true) {
-		found = advanced_vision.detect_object(shirt);
-		pros::lcd::set_text(1, "Area: " + std::to_string(found.area));
-		pros::lcd::set_text(2, "Dist: " + std::to_string(found.apprx_distance));
-		pros::lcd::set_text(3, "Valid: " + std::to_string(found.valid));
-		//show x and y position
-		pros::lcd::set_text(4, "X: " + std::to_string(found.x_px));
-		pros::lcd::set_text(5, "Y: " + std::to_string(found.y_px));
-		printf("loop\n");
-		pros::delay(1000);
+
+		// copy output of visiondetect::Vision::find_objects() to found_disk
+		printf("Finding yellow disks\n");
+		bool found_yellow_disk = advanced_vision.detect_object(yellow_disk, &found_disk);
+		if(found_yellow_disk)
+			printf("Found Disk Data: { area: %d, x: %d, y: %d, width: %d, height: %d, apprx_distance: %f }\n", found_disk.area, found_disk.x_px, found_disk.y_px, found_disk.width, found_disk.height, found_disk.apprx_distance);
+		else
+			printf("No Disk Found\n");
+
+		printf("Finding yellow goals\n");
+
+		pros::delay(20);
+
+		// copy output of visiondetect::Vision::find_objects() to found_goal
+		/*
+		bool found_yellow_goal = advanced_vision.detect_object(yellow_goal, &found_goal);
+		
+		if(found_yellow_goal)
+			printf("Found Goal Data: { area: %d, x: %d, y: %d, width: %d, height: %d, apprx_distance: %f }\n", found_goal.area, found_goal.x_px, found_goal.y_px, found_goal.width, found_goal.height, found_goal.apprx_distance);
+		else
+			printf("No Goal Found\n");
+
+		pros::lcd::set_text(0, "Disk: " + std::to_string(found_disk.area));
+		pros::lcd::set_text(1, "Goal: " + std::to_string(found_goal.area));
+	*/
+		printf("lkajfljssssssssss\n");
+		pros::delay(20);
+		printf("dkdddddddddddddddddd\n");
 	}
 }

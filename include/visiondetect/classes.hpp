@@ -17,12 +17,10 @@ namespace visiondetect {
         float ratio; /// width / height
         float ratio_range; /// percent error to remain valid
 
-        bool predict_offscreen;
-
         Object(pros::vision_signature_s_t sig, float ratio, int sample_size, int best_brightness, int min_area, float ratio_range);
-        //~Object();
-        void apprx_distance(visiondetect::detected_object_s_t);
-        void add_sample(visiondetect::simple_object_data_s_t sample);
+        ~Object();
+        void apprx_distance(visiondetect::detected_object_s_t*);
+        void add_sample(visiondetect::simple_object_data_s_t* sample);
         void add_samples(visiondetect::simple_object_data_s_t *samples, int size);
         void clear_samples();
 };
@@ -43,14 +41,15 @@ namespace visiondetect {
         int screen_padding;
 
         bool predict_offscreen;
+        int attempt_combine_close_objects;
 
         Vision(int port, int n_samples = 5, int n_retries = 10, int screen_padding = 4, bool predict_offscreen = false);
         //~Vision();
         void calibrate_brightness(visiondetect::Object);
-        visiondetect::detected_object_s_t find_object(visiondetect::Object);
-        visiondetect::detected_object_s_t detect_object(visiondetect::Object);
-        bool validate_object(visiondetect::Object, visiondetect::detected_object_s_t);
-       
+        bool find_object(visiondetect::Object, visiondetect::detected_object_s_t*);
+        bool detect_object(visiondetect::Object, visiondetect::detected_object_s_t*);
+        bool validate_object(visiondetect::Object, visiondetect::detected_object_s_t*);
+        bool get_largest_object(visiondetect::Object, pros::vision_object_s_t*);
     private:
         void insert_sort_samples(uint16_t*, uint16_t, int);
     };
